@@ -16,10 +16,29 @@ Crafty.c('Board', {
 	 * Initialize the board.
 	 */
 	init: function() {
-		this.requires('Canvas, 2D')
-			.bind('Draw', this.drawBoard);
+		this.requires('Canvas, 2D, Mouse')
+			.bind('Draw', this.drawBoard)
+			.bind('Click', function(e) {
+				var x = e.layerX - this._x,
+					y = e.layerY - this._y,
+					cell_size = Math.ceil(this._w / this._grid_size);
+				x = Math.ceil(x / cell_size);
+				y = Math.ceil(y / cell_size);
+
+				Crafty.trigger('BoardCellClicked', {
+					board: this,
+					event: e,
+					x: x,
+					y: y
+				});
+			});
 	},
 
+	/**
+	 * Draw the board using the canvas context.
+	 *
+	 * @param object vars Canvas variables
+	 */
 	drawBoard: function(vars) {
 		var context = vars.ctx,
 			cell_size = Math.ceil(this._w / this._grid_size);
@@ -54,10 +73,12 @@ Crafty.c('Board', {
 	 * Setup the board with a specific size.
 	 *
 	 * @param int size Size of the grid
+	 * @return this
 	 */
 	board: function(size) {
 		this._grid_size = size || this._grid_size;
 		this.ready = true;
+		return this;
 	}
 });
 
