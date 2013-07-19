@@ -17,21 +17,12 @@ Crafty.scene('Game', function() {
 		.attr({ x: board_x, y: board_y, w: board_width, h: board_height })
 		.board(board_size);
 
-	// Selected cells
-	var cells = new Array(board_size);
-	for (var x = 0; x < cells.length; x++) {
-		cells[x] = new Array(board_size);
-		for (var y = 0; y < cells[x].length; y++) {
-			cells[x][y] = false;
-		}
-	}
-
 	// Events
-	this.bind('BoardCellClicked', function(e) {
-		console.log('Board cell clicked: ' + e.x + 'x' + e.y);
+	this.bind('BoardChanged', function(board) {
+		console.log('BoardChanged', board._cells);
 	});
 }, function() {
-	this.unbind('BoardCellClicked');
+	this.unbind('BoardChanged');
 });
 
 })();

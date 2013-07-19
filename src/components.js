@@ -6,6 +6,13 @@
  */
 Crafty.c('Board', {
 	/**
+	 * List of "active" cells.
+	 *
+	 * @var array
+	 */
+	_cells: undefined,
+
+	/**
 	 * Size of the grid.
 	 *
 	 * @var int
@@ -22,15 +29,13 @@ Crafty.c('Board', {
 				var x = e.layerX - this._x,
 					y = e.layerY - this._y,
 					cell_size = Math.ceil(this._w / this._grid_size);
-				x = Math.ceil(x / cell_size);
-				y = Math.ceil(y / cell_size);
+				x = Math.floor(x / cell_size);
+				y = Math.floor(y / cell_size);
 
-				Crafty.trigger('BoardCellClicked', {
-					board: this,
-					event: e,
-					x: x,
-					y: y
-				});
+				this._cells[x][y] = !this._cells[x][y];
+				this.trigger('Change');
+
+				Crafty.trigger('BoardChanged', this);
 			});
 	},
 
@@ -46,7 +51,7 @@ Crafty.c('Board', {
 		context.save();
 
 		// Inner separators
-		context.strokeStyle = 'rgba(63, 193, 245, 0.3)';
+		context.strokeStyle = 'rgba(63, 193, 245, 0.7)';
 		context.lineWidth = 1;
 		for (var i = 1; i < this._grid_size; i++) {
 			context.beginPath();
@@ -66,6 +71,16 @@ Crafty.c('Board', {
 		context.lineWidth = 2;
 		context.strokeRect(this._x, this._y, this._w, this._h);
 
+		// Cells
+		context.fillStyle = 'rgb(117, 119, 120)';
+		for (var x = 0; x < this._cells.length; x++) {
+			for (var y = 0; y < this._cells[x].length; y++) {
+				if (this._cells[x][y]) {
+					context.fillRect(this._x + (cell_size * x) + 1, this._y + (cell_size * y) + 1, cell_size - 2, cell_size - 2);
+				}
+			}
+		}
+
 		context.restore();
 	},
 
@@ -77,6 +92,15 @@ Crafty.c('Board', {
 	 */
 	board: function(size) {
 		this._grid_size = size || this._grid_size;
+
+		this._cells = new Array(this._grid_size);
+		for (var x = 0; x < this._cells.length; x++) {
+			this._cells[x] = new Array(this._grid_size);
+			for (var y = 0; y < this._cells[x].length; y++) {
+				this._cells[x][y] = false;
+			}
+		}
+
 		this.ready = true;
 		return this;
 	}
