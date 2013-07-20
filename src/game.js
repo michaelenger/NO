@@ -21,6 +21,7 @@ var Game = {
 	 */
 	start: function() {
 		var element = document.getElementById('cr-stage');
+		Crafty.mobile = false; // prevent Crafty from taking up the whole viewport
 		Crafty.init(Game.config.width, Game.config.height);
 		Crafty.background('#f0f3f7');
 		Crafty.scene('Loading');

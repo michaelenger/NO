@@ -43,3 +43,8 @@ h2 {
 	margin: 1em auto;
 	width: 800px;
 }
+
+	.game a {
+		color: inherit;
+		text-decoration: none;
+	}
