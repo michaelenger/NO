@@ -11,10 +11,7 @@ Crafty.scene('Game', function() {
 		board_x = Math.ceil((Game.config.width - board_width) / 2),
 		board_y = Math.ceil((Game.config.height - board_height) * 0.8),
 		puzzle = new Array(board_size),
-		clues = {
-			horizontal: new Array(board_size),
-			vertical: new Array(board_size)
-		};
+		clues = undefined;
 
 	// Puzzle
 	for (var x = 0; x < puzzle.length; x++) {
@@ -24,39 +21,49 @@ Crafty.scene('Game', function() {
 		}
 	}
 
-	// Clues - please excuse how ugly this is....
-	var ynum = new Array(puzzle.length);
-	for (var y = 0; y < ynum.length; y++) {
-		ynum[y] = 0;
-		clues.horizontal[y] = new Array();
-	}
-	for (var x = 0; x < puzzle.length; x++) {
-		var num = 0;
-		clues.vertical[x] = new Array();
-		for (var y = 0; y < puzzle[x].length; y++) {
-			if (puzzle[x][y]) {
-				num++;
-				ynum[y]++;
-			} else {
-				if (num) {
-					clues.vertical[x].push(num);
+	// Translate cells to horizontal/vertical clues
+	// Please excuse how ugly this is....
+	var translateCellsToClues = function(cells) {
+		var clues = {
+				horizontal: new Array(cells.length),
+				vertical: new Array(cells.length)
+			},
+			ynum = new Array(cells.length);
+		for (var y = 0; y < ynum.length; y++) {
+			ynum[y] = 0;
+			clues.horizontal[y] = new Array();
+		}
+		for (var x = 0; x < cells.length; x++) {
+			var num = 0;
+			clues.vertical[x] = new Array();
+			for (var y = 0; y < cells[x].length; y++) {
+				if (cells[x][y]) {
+					num++;
+					ynum[y]++;
+				} else {
+					if (num) {
+						clues.vertical[x].push(num);
+					}
+					if (ynum[y]) {
+						clues.horizontal[y].push(ynum[y]);
+					}
+					num = 0;
+					ynum[y] = 0;
 				}
-				if (ynum[y]) {
-					clues.horizontal[y].push(ynum[y]);
-				}
-				num = 0;
-				ynum[y] = 0;
+			}
+			if (num) {
+				clues.vertical[x].push(num);
 			}
 		}
-		if (num) {
-			clues.vertical[x].push(num);
+		for (var y = 0; y < ynum.length; y++) {
+			if (ynum[y]) {
+				clues.horizontal[y].push(ynum[y]);
+			}
 		}
+
+		return clues;
 	}
-	for (var y = 0; y < ynum.length; y++) {
-		if (ynum[y]) {
-			clues.horizontal[y].push(ynum[y]);
-		}
-	}
+	clues = translateCellsToClues(puzzle);
 
 	// Output the puzzle (for debug reasons)
 	var output = new Array(puzzle.length);
@@ -105,18 +112,8 @@ Crafty.scene('Game', function() {
 
 	// Events
 	this.bind('BoardChanged', function(board) {
-		var success = true;
-		for (var x = 0; x < puzzle.length; x++) {
-			for (var y = 0; y < puzzle[x].length; y++) {
-				if (puzzle[x][y] !== board._cells[x][y]) {
-					success = false;
-					break;
-				}
-			}
-			if (!success) {
-				break;
-			}
-		}
+		var boardClues = translateCellsToClues(board._cells),
+			success = clues.vertical.compare(boardClues.vertical) && clues.horizontal.compare(boardClues.horizontal);
 		console.log('BoardChanged', success);
 	});
 }, function() {
