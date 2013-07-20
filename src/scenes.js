@@ -114,7 +114,9 @@ Crafty.scene('Game', function() {
 	this.bind('BoardChanged', function(board) {
 		var boardClues = translateCellsToClues(board._cells),
 			success = clues.vertical.compare(boardClues.vertical) && clues.horizontal.compare(boardClues.horizontal);
-		console.log('BoardChanged', success);
+		if (success) {
+			Crafty.scene('Game'); // hard-reset, MOTHERFUCKER
+		}
 	});
 }, function() {
 	this.unbind('BoardChanged');
