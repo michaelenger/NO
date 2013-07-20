@@ -20,7 +20,7 @@ Crafty.scene('Game', function() {
 	for (var x = 0; x < puzzle.length; x++) {
 		puzzle[x] = new Array(board_size);
 		for (var y = 0; y < puzzle[x].length; y++) {
-			puzzle[x][y] = Math.round(Math.random()) == 1 ? true : false;
+			puzzle[x][y] = Math.round(Math.random() * 5) < 2 ? false : true; // 3/5 chance of getting a filled-in cell
 		}
 	}
 
