@@ -20,6 +20,13 @@ Crafty.c('Board', {
 	_cells: undefined,
 
 	/**
+	 * List of clue entities.
+	 *
+	 * @var array
+	 */
+	_clues: [],
+
+	/**
 	 * Size of the grid.
 	 *
 	 * @var int
@@ -32,7 +39,7 @@ Crafty.c('Board', {
 	init: function() {
 		this.requires('Canvas, 2D, Mouse')
 			.bind('Draw', this.drawBoard)
-			.bind('Click', this.clickEvent);
+			.bind('MouseDown', this.mouseDownEvent);
 	},
 
 	/**
@@ -42,7 +49,9 @@ Crafty.c('Board', {
 	 */
 	drawBoard: function(vars) {
 		var context = vars.ctx,
-			cell_size = Math.ceil(this._w / this._grid_size);
+			cell_size = Math.ceil(this._w / this._grid_size),
+			clue_image = new Image();
+		clue_image.src = 'assets/clue.png';
 
 		context.save();
 
@@ -68,11 +77,17 @@ Crafty.c('Board', {
 		context.strokeRect(this._x, this._y, this._w, this._h);
 
 		// Cells
-		context.fillStyle = 'rgba(117, 119, 120, 0.9)';
+		for (var i = 0; i < this._clues.length; i++) {
+			//this._clues[i].destroy();
+		}
+		this._clues = [];
+		context.fillStyle = 'rgba(117, 119, 120, 1)';
 		for (var x = 0; x < this._cells.length; x++) {
 			for (var y = 0; y < this._cells[x].length; y++) {
-				if (this._cells[x][y]) {
+				if (this._cells[x][y] === 1) {
 					context.fillRect(this._x + (cell_size * x) + 1, this._y + (cell_size * y) + 1, cell_size - 2, cell_size - 2);
+				} else if (this._cells[x][y] === -1) {
+					context.drawImage(clue_image, this._x + (cell_size * x), this._y + (cell_size * y), cell_size, cell_size)
 				}
 			}
 		}
@@ -93,7 +108,7 @@ Crafty.c('Board', {
 		for (var x = 0; x < this._cells.length; x++) {
 			this._cells[x] = new Array(this._grid_size);
 			for (var y = 0; y < this._cells[x].length; y++) {
-				this._cells[x][y] = false;
+				this._cells[x][y] = 0;
 			}
 		}
 
@@ -106,7 +121,7 @@ Crafty.c('Board', {
 	 *
 	 * @param MouseEvent event Mouse event
 	 */
-	clickEvent: function(e) {
+	mouseDownEvent: function(e) {
 		if (!this._active) {
 			return;
 		}
@@ -117,11 +132,26 @@ Crafty.c('Board', {
 		x = Math.floor(x / cell_size);
 		y = Math.floor(y / cell_size);
 
-		this._cells[x][y] = !this._cells[x][y];
+		if (e.mouseButton == Crafty.mouseButtons.LEFT) {
+			this._cells[x][y] = this._cells[x][y] === 1 ? 0 : 1;
+		} else if (e.mouseButton == Crafty.mouseButtons.RIGHT) {
+			this._cells[x][y] = this._cells[x][y] === -1 ? 0 : -1;
+		}
 		this.trigger('Change');
 
 		Crafty.trigger('BoardChanged', this);
 	}
+});
+
+/**
+ * Clue - A clue which can be placed on the board.
+ */
+Crafty.c('Clue', {
+	init: function() {
+		this.requires('2D, Canvas, Color')
+			.color('red')
+			.attr({ x: 100, y: 100, w: 30, h: 30 })
+	},
 });
 
 /**

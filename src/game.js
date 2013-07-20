@@ -23,7 +23,7 @@ var Game = {
 		var element = document.getElementById('cr-stage');
 		Crafty.init(Game.config.width, Game.config.height);
 		Crafty.background('#f0f3f7');
-		Crafty.scene('Game');
+		Crafty.scene('Loading');
 	}
 
 }

@@ -2,6 +2,28 @@
 "use strict";
 
 /**
+ * Loading Scene - Loads assets.
+ */
+Crafty.scene('Loading', function() {
+	Crafty.e('2D, DOM, Text')
+		.text('Loading')
+		.attr({ x: 0, y: Game.config.height * 0.35, w: Game.config.width, h: 60 })
+		.textFont({
+			weight: 'bold',
+			family: 'Arial',
+			size: '60px'
+		}).css({ color: 'rgba(50,50,50,0.1)', 'text-align': 'center' });
+
+	Crafty.load(['assets/clue.png'], function() {
+		Crafty.sprite(30, 'assets/clue.png', {
+			sprite_clue: [0, 0]
+		});
+
+		Crafty.scene('Game');
+	});
+});
+
+/**
  * Game Scene - Where the action is ;)
  */
 Crafty.scene('Game', function() {
@@ -18,7 +40,7 @@ Crafty.scene('Game', function() {
 	for (var x = 0; x < puzzle.length; x++) {
 		puzzle[x] = new Array(board_size);
 		for (var y = 0; y < puzzle[x].length; y++) {
-			puzzle[x][y] = Math.round(Math.random() * 5) < 2 ? false : true; // 3/5 chance of getting a filled-in cell
+			puzzle[x][y] = Math.round(Math.random() * 5) < 2 ? 0 : 1; // 3/5 chance of getting a filled-in cell
 		}
 	}
 
@@ -38,7 +60,7 @@ Crafty.scene('Game', function() {
 			var num = 0;
 			clues.vertical[x] = new Array();
 			for (var y = 0; y < cells[x].length; y++) {
-				if (cells[x][y]) {
+				if (cells[x][y] === 1) {
 					num++;
 					ynum[y]++;
 				} else {
@@ -119,14 +141,13 @@ Crafty.scene('Game', function() {
 			var end_time = new Date(),
 				time_taken = (end_time - start_time) / 1000;
 			board._active = false;
-			time_taken = Math.round(time_taken * 100) / 100; // two decimal points only, plx
 
 			if (time_taken > 60) {
 				var min = Math.floor(time_taken / 60),
 					sec = time_taken - (min * 60);
-				time_taken = min + ' minutes ' + sec + ' seconds';
+				time_taken = min + ' minutes ' + Math.round(sec * 100) / 100 + ' seconds';
 			} else {
-				time_taken = time_taken + ' seconds';
+				time_taken = Math.round(time_taken * 100) / 100 + ' seconds';
 			}
 
 			// End game overlay
