@@ -72,7 +72,7 @@ Crafty.c('Board', {
 		context.strokeRect(this._x, this._y, this._w, this._h);
 
 		// Cells
-		context.fillStyle = 'rgb(117, 119, 120)';
+		context.fillStyle = 'rgba(117, 119, 120, 0.9)';
 		for (var x = 0; x < this._cells.length; x++) {
 			for (var y = 0; y < this._cells[x].length; y++) {
 				if (this._cells[x][y]) {
