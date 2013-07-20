@@ -40,7 +40,7 @@ Crafty.scene('Game', function() {
 	for (var x = 0; x < puzzle.length; x++) {
 		puzzle[x] = new Array(board_size);
 		for (var y = 0; y < puzzle[x].length; y++) {
-			puzzle[x][y] = Math.round(Math.random() * 5) < 2 ? 0 : 1; // 3/5 chance of getting a filled-in cell
+			puzzle[x][y] = Math.round(Math.random());
 		}
 	}
 
@@ -165,7 +165,7 @@ Crafty.scene('Game', function() {
 							size: '60px'
 						}).css({ color: '#444', 'text-align': 'center' });
 					Crafty.e('2D, DOM, Text')
-						.text('You completed the level in <span style="color:rgb(125,198,250)">' + time_taken + '</span>!')
+						.text('You completed the puzzle in <span style="color:rgb(125,198,250)">' + time_taken + '</span>!')
 						.attr({ x: 0, y: Game.config.width * 0.15 + 80, w: Game.config.width, h: 20 })
 						.textFont({
 							weight: 'bold',
