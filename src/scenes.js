@@ -7,13 +7,12 @@
 Crafty.scene('Loading', function() {
 	Crafty.e('2D, DOM, Text')
 		.text('Loading')
-		.attr({ x: 0, y: Game.config.height * 0.35, w: Game.config.width, h: 60 })
+		.attr({ x: 0, y: Crafty.viewport.height * 0.35, w: Crafty.viewport.width, h: 60 })
 		.textFont({
 			weight: 'bold',
 			family: 'Arial',
 			size: '60px'
 		}).css({ color: 'rgba(50,50,50,0.1)', 'text-align': 'center' });
-
 	Crafty.load(['assets/clue.png'], function() {
 		Crafty.sprite(30, 'assets/clue.png', {
 			sprite_clue: [0, 0]
@@ -28,10 +27,10 @@ Crafty.scene('Loading', function() {
  */
 Crafty.scene('Game', function() {
 	var board_size = 6, // @todo: set this in a menu somewhere
-		board_width = Math.ceil((Game.config.width < Game.config.height ? Game.config.width : Game.config.height) * 0.6),
+		board_width = Math.ceil((Crafty.viewport.width < Crafty.viewport.height ? Crafty.viewport.width : Crafty.viewport.height) * 0.6),
 		board_height = board_width,
-		board_x = Math.ceil((Game.config.width - board_width) / 2),
-		board_y = Math.ceil((Game.config.height - board_height) * 0.8),
+		board_x = Math.ceil((Crafty.viewport.width - board_width) / 2),
+		board_y = Math.ceil((Crafty.viewport.height - board_height) * 0.8),
 		puzzle = new Array(board_size),
 		clues = undefined,
 		start_time = new Date();
@@ -152,13 +151,13 @@ Crafty.scene('Game', function() {
 
 			// End game overlay
 			var overlay = Crafty.e('2D, DOM, Color, Tween')
-				.attr({ x: 0, y: 0, w: Game.config.width, h: Game.config.height, alpha: 0 })
+				.attr({ x: 0, y: 0, w: Crafty.viewport.width, h: Crafty.viewport.height, alpha: 0 })
 				.color('#f0f3f7')
 				.tween({alpha: 0.95 }, 15)
 				.bind('TweenEnd', function() {
 					Crafty.e('2D, DOM, Text')
 						.text('Congratulations!')
-						.attr({ x: 0, y: Game.config.width * 0.15, w: Game.config.width, h: 60 })
+						.attr({ x: 0, y: Crafty.viewport.width * 0.15, w: Crafty.viewport.width, h: 60 })
 						.textFont({
 							weight: 'bold',
 							family: 'Arial',
@@ -166,14 +165,14 @@ Crafty.scene('Game', function() {
 						}).css({ color: '#444', 'text-align': 'center' });
 					Crafty.e('2D, DOM, Text')
 						.text('You completed the puzzle in <span style="color:rgb(125,198,250)">' + time_taken + '</span>!')
-						.attr({ x: 0, y: Game.config.width * 0.15 + 80, w: Game.config.width, h: 20 })
+						.attr({ x: 0, y: Crafty.viewport.width * 0.15 + 80, w: Crafty.viewport.width, h: 20 })
 						.textFont({
 							weight: 'bold',
 							family: 'Arial',
 							size: '20px'
 						}).css({ color: '#666', 'text-align': 'center' });
 					Crafty.e('TextButton')
-						.button('Play Again', Game.config.width / 2, Game.config.height * 0.8)
+						.button('Play Again', Crafty.viewport.width / 2, Crafty.viewport.height * 0.8)
 						.bind('ButtonClicked', function() {
 							Crafty.scene('Game');
 						});
