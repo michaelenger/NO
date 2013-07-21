@@ -112,7 +112,11 @@ Crafty.c('Board', {
 			}
 		}
 
-		this.ready = true;
+		if (this.ready) {
+			this.trigger('Change');
+		} else {
+			this.ready = true;
+		}
 		return this;
 	},
 
@@ -144,14 +148,111 @@ Crafty.c('Board', {
 });
 
 /**
- * Clue - A clue which can be placed on the board.
+ * Button - Generic button component.
  */
-Crafty.c('Clue', {
+Crafty.c('Button', {
+
+	/**
+	 * Initialize the component.
+	 */
 	init: function() {
-		this.requires('2D, Canvas, Color')
-			.color('red')
-			.attr({ x: 100, y: 100, w: 30, h: 30 })
+		this.requires('2D, Mouse')
+			.bind('Click', this.clickEvent);
 	},
+
+	/**
+	 * Button was clicked.
+	 *
+	 * @param MouseEvent event Mouse event
+	 */
+	clickEvent: function(event) {
+		this.trigger('ButtonClicked', this);
+	}
+});
+
+/**
+ * SpriteButton - Button which can be clicked based on a sprite.
+ */
+Crafty.c('SpriteButton', {
+
+	/**
+	 * Contains the current sprite.
+	 *
+	 * @var Entity
+	 */
+	_sprite: undefined,
+
+	/**
+	 * The sprites for normal and hover states.
+	 *
+	 * @var string
+	 */
+	_sprite_normal: undefined,
+	_sprite_hover: undefined,
+
+	/**
+	 * Initialize the component.
+	 */
+	init: function() {
+		this.requires('Button')
+			.bind('MouseOver', this.mouseOverEvent)
+			.bind('MouseOut', this.mouseOutEvent);
+	},
+
+	/**
+	 * Configure the button with the correct position.
+	 *
+	 * @param string normal_sprite Name of the sprite to show in normal state
+	 * @param string hover_sprite  Name of the sprite to show in hover state
+	 * @param int    x
+	 * @param int    y
+	 * @return this
+	 */
+	button: function(normal_sprite, hover_sprite, x, y) {
+		this._sprite_normal = normal_sprite;
+		this._sprite_hover = hover_sprite;
+		this.attr({ x: x, y: y })
+			.sprite(normal_sprite);
+		return this;
+	},
+
+	/**
+	 * Button was mouse outed.
+	 *
+	 * @param MouseEvent event Mouse event
+	 */
+	mouseOutEvent: function(event) {
+		if (this._sprite_normal) {
+			this.sprite(this._sprite_normal);
+		}
+	},
+
+	/**
+	 * Button was mouse overed.
+	 *
+	 * @param MouseEvent event Mouse event
+	 */
+	mouseOverEvent: function(event) {
+		if (this._sprite_hover) {
+			this.sprite(this._sprite_hover);
+		}
+	},
+
+	/**
+	 * Set the current sprite.
+	 *
+	 * @param string sprite Name of the sprite to set.
+	 * @return this
+	 */
+	sprite: function(sprite) {
+		if (typeof this._sprite !== 'undefined') {
+			this._sprite.destroy();
+			this._sprite = undefined;
+		}
+		this._sprite = Crafty.e('2D, Canvas, ' + sprite)
+			.attr({ x: this._x , y: this._y });
+		this.attr({ w: this._sprite._w, h: this._sprite._h });
+	}
 });
 
 /**
@@ -181,7 +282,7 @@ Crafty.c('TextButton', {
 	 * Initialize the component.
 	 */
 	init: function() {
-		this.requires('2D, DOM, Text, Mouse')
+		this.requires('Button, DOM, Text')
 			.textFont(this._font)
 			.css({
 				color: this._textColorNormal,
@@ -189,8 +290,7 @@ Crafty.c('TextButton', {
 				'text-align': 'center'
 			})
 			.bind('MouseOver', this.mouseOverEvent)
-			.bind('MouseOut', this.mouseOutEvent)
-			.bind('Click', this.clickEvent);
+			.bind('MouseOut', this.mouseOutEvent);
 	},
 
 	/**
@@ -207,15 +307,6 @@ Crafty.c('TextButton', {
 		this.text(text)
 			.attr({ x: x - Math.ceil(width / 2), y: y - Math.ceil(height / 2), w: width, h: height });
 		return this;
-	},
-
-	/**
-	 * Button was clicked.
-	 *
-	 * @param MouseEvent event Mouse event
-	 */
-	clickEvent: function(event) {
-		this.trigger('ButtonClicked', this);
 	},
 
 	/**

@@ -13,31 +13,105 @@ Crafty.scene('Loading', function() {
 			family: 'Arial',
 			size: '60px'
 		}).css({ color: 'rgba(50,50,50,0.1)', 'text-align': 'center' });
-	Crafty.load(['assets/clue.png'], function() {
+	Crafty.load(['assets/clue.png', 'assets/arrows.gif'], function() {
 		Crafty.sprite(30, 'assets/clue.png', {
 			sprite_clue: [0, 0]
 		});
+		Crafty.sprite(32, 'assets/arrows.png', {
+			sprite_arrow_left: [0, 0],
+			sprite_arrow_right: [1, 0],
+			sprite_arrow_left_hover: [0, 1],
+			sprite_arrow_right_hover: [1, 1]
+		});
 
-		Crafty.scene('Game');
+		Crafty.scene('Menu');
 	});
+});
+
+/**
+ * Menu Scene - Lets the user choose the size of the map.
+ */
+Crafty.scene('Menu', function() {
+	var board_size = Game.config.board_size,
+		board_width = Math.ceil((Crafty.viewport.width < Crafty.viewport.height ? Crafty.viewport.width : Crafty.viewport.height) * 0.6),
+		board_height = board_width,
+		board_x = Math.ceil((Crafty.viewport.width - board_width) / 2),
+		board_y = Math.ceil(Crafty.viewport.height * 0.4 - (board_height / 2));
+
+	var board = Crafty.e('Board')
+		.attr({ x: board_x, y: board_y, w: board_width, h: board_height })
+		.board(board_size);
+	board._active = false;
+
+	// Puzzle size
+	var sizes = {
+		3: 'Tiny',
+		4: 'Smaller',
+		5: 'Small',
+		6: 'Normal',
+		7: 'Big',
+		8: 'Bigger',
+		9: 'Huge',
+		10: 'Gigantic'
+	};
+	var puzzle_size = Crafty.e('2D, DOM, Text')
+		.text(sizes[board_size])
+		.attr({ x: 0, y: board_y + board_height + 15, w: Crafty.viewport.width })
+		.textFont({
+			family: 'Arial',
+			weight: 'bold',
+			size: '16px'
+		})
+		.css({
+			color: '#999',
+			'text-align': 'center',
+			'text-transform': 'uppercase'
+		});
+
+	// Previous & Next
+	Crafty.e('SpriteButton')
+		.button('sprite_arrow_left', 'sprite_arrow_left_hover', Crafty.viewport.width * 0.15 - 16, Crafty.viewport.height * 0.4)
+		.bind('ButtonClicked', function() {
+			if (board_size > 3) {
+				board_size--;
+				puzzle_size.text(sizes[board_size]);
+				board.board(board_size);
+			}
+		});
+	Crafty.e('SpriteButton')
+		.button('sprite_arrow_right', 'sprite_arrow_right_hover', Crafty.viewport.width * 0.85 - 16, Crafty.viewport.height * 0.4)
+		.bind('ButtonClicked', function() {
+			if (board_size < 10) {
+				board_size++;
+				puzzle_size.text(sizes[board_size]);
+				board.board(board_size);
+			}
+		});
+
+	// Start
+	Crafty.e('TextButton')
+		.button('Start Game', Crafty.viewport.width / 2, Crafty.viewport.height * 0.85)
+		.bind('ButtonClicked', function() {
+			Game.config.board_size = board_size;
+			Crafty.scene('Game');
+		});
 });
 
 /**
  * Game Scene - Where the action is ;)
  */
 Crafty.scene('Game', function() {
-	var board_size = 6, // @todo: set this in a menu somewhere
-		board_width = Math.ceil((Crafty.viewport.width < Crafty.viewport.height ? Crafty.viewport.width : Crafty.viewport.height) * 0.6),
+	var board_width = Math.ceil((Crafty.viewport.width < Crafty.viewport.height ? Crafty.viewport.width : Crafty.viewport.height) * 0.6),
 		board_height = board_width,
 		board_x = Math.ceil((Crafty.viewport.width - board_width) / 2),
 		board_y = Math.ceil((Crafty.viewport.height - board_height) * 0.8),
-		puzzle = new Array(board_size),
+		puzzle = new Array(Game.config.board_size),
 		clues = undefined,
 		start_time = new Date();
 
 	// Puzzle
 	for (var x = 0; x < puzzle.length; x++) {
-		puzzle[x] = new Array(board_size);
+		puzzle[x] = new Array(Game.config.board_size);
 		for (var y = 0; y < puzzle[x].length; y++) {
 			puzzle[x][y] = Math.round(Math.random());
 		}
@@ -102,10 +176,10 @@ Crafty.scene('Game', function() {
 	// Game board
 	var board = Crafty.e('Board')
 		.attr({ x: board_x, y: board_y, w: board_width, h: board_height })
-		.board(board_size);
+		.board(Game.config.board_size);
 
 	// Clues
-	var cell_size = Math.ceil(board_height / board_size),
+	var cell_size = Math.ceil(board_height / Game.config.board_size),
 		clue_css = {
 			'color': '#444',
 			'text-align': 'right',
@@ -172,9 +246,14 @@ Crafty.scene('Game', function() {
 							size: '20px'
 						}).css({ color: '#666', 'text-align': 'center' });
 					Crafty.e('TextButton')
-						.button('Play Again', Crafty.viewport.width / 2, Crafty.viewport.height * 0.8)
+						.button('Play Again', Crafty.viewport.width / 2, Crafty.viewport.height * 0.7)
 						.bind('ButtonClicked', function() {
 							Crafty.scene('Game');
+						});
+					Crafty.e('TextButton')
+						.button('Back', Crafty.viewport.width / 2, Crafty.viewport.height * 0.7 + 60)
+						.bind('ButtonClicked', function() {
+							Crafty.scene('Menu');
 						});
 				});
 		}
