@@ -206,6 +206,15 @@ Crafty.scene('Game', function() {
 			.css(clue_css);
 	}
 
+	Crafty.e('TextButton')
+		.button('BACK', Crafty.viewport.width - 48, 24)
+		.textFont({
+			size: '24px'
+		})
+		.bind('ButtonClicked', function() {
+			Crafty.scene('Menu');
+		});
+
 	// Events
 	this.bind('BoardChanged', function(board) {
 		var boardClues = translateCellsToClues(board._cells),
