@@ -49,7 +49,7 @@ Crafty.c('Board', {
 	 */
 	drawBoard: function(vars) {
 		var context = vars.ctx,
-			cell_size = Math.ceil(this._w / this._grid_size),
+			cell_size = this._w / this._grid_size,
 			clue_image = new Image();
 		clue_image.src = 'assets/clue.png';
 
