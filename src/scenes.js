@@ -13,7 +13,7 @@ Crafty.scene('Loading', function() {
 			family: 'Arial',
 			size: '60px'
 		}).css({ color: 'rgba(50,50,50,0.1)', 'text-align': 'center' });
-	Crafty.load(['assets/clue.png', 'assets/arrows.gif'], function() {
+	Crafty.load(['assets/clue.png', 'assets/arrows.png'], function() {
 		Crafty.sprite(30, 'assets/clue.png', {
 			sprite_clue: [0, 0]
 		});
