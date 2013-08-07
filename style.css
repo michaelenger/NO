@@ -48,3 +48,21 @@ h2 {
 		color: inherit;
 		text-decoration: none;
 	}
+
+/** Instructions **/
+
+.instructions {
+	margin: 1em auto;
+	text-align: left;
+	width: 800px;
+}
+
+	.instructions img {
+		display: block;
+		margin: 0.5em auto;
+		height: 300px;
+	}
+
+	.instructions p {
+		line-height: 1.4;
+	}
