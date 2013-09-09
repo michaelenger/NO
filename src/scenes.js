@@ -13,7 +13,7 @@ Crafty.scene('Loading', function() {
 			family: 'Arial',
 			size: '60px'
 		}).css({ color: 'rgba(50,50,50,0.1)', 'text-align': 'center' });
-	Crafty.load(['assets/clue.png', 'assets/arrows.png'], function() {
+	Crafty.load(['assets/clue.png', 'assets/arrows.png', 'assets/example_1.png', 'assets/example_2.png', 'assets/example_3.png'], function() {
 		Crafty.sprite(30, 'assets/clue.png', {
 			sprite_clue: [0, 0]
 		});
@@ -115,10 +115,94 @@ Crafty.scene('Menu', function() {
 
 	// Start
 	Crafty.e('TextButton')
-		.button('Start Game', Crafty.viewport.width / 2, Crafty.viewport.height * 0.85)
+		.button('Start Game', Crafty.viewport.width / 2, Crafty.viewport.height * 0.82)
 		.bind('ButtonClicked', function() {
 			Game.config.board_size = board_size;
 			Crafty.scene('Game');
+		});
+
+	// Instructions
+	Crafty.e('TextButton')
+		.button('Instructions', Crafty.viewport.width / 2, Crafty.viewport.height * 0.82 + 50)
+		.bind('ButtonClicked', function() {
+			Game.config.board_size = board_size;
+			Crafty.scene('Instructions');
+		});
+});
+
+/**
+ * Instructions Scene - Shows how to play the game.
+ */
+Crafty.scene('Instructions', function() {
+
+	// Pages
+	var current_page = 0,
+		pages = [
+		Crafty.e("HTML")
+			.attr({ x:0, y:0, w:Crafty.viewport.width, h:Crafty.viewport.height })
+			.replace('<div class="instructions"><h3>How to Play</h3>\
+			<p>\
+				This game is a basic interpretation of a <a href="http://en.wikipedia.org/wiki/Nonogram">Nonogram</a>, where you fill in a pattern on a grid based on the numbers surrounding it.\
+			</p>\
+			<p>\
+				The numbers on the sides are clues to which grid cells need to be filled in. The number denotes the amount of <em>connected cells</em> which are filled in and in the cases where there is more than one number, it means that there are several groups of cells with one (or more) empty spaces between them.\
+				<img src="assets/example_1.png" alt="">\
+			</p>'),
+		Crafty.e("HTML")
+			.attr({ x:0, y:0, w:Crafty.viewport.width, h:Crafty.viewport.height })
+			.replace('<div class="instructions"><h3>How to Play</h3>\
+			<p>\
+				The filled in cells don\'t have to be separated by a single empty space, nor do they have to hug the sides.\
+				<img src="assets/example_2.png" alt="">\
+			</p>'),
+		Crafty.e("HTML")
+			.attr({ x:0, y:0, w:Crafty.viewport.width, h:Crafty.viewport.height })
+			.replace('<div class="instructions"><h3>How to Play</h3>\
+			<p>\
+				Use the <strong>not-filled hint</strong> to put down clues on which cells shouldn\'t be filled in. This really helps on larger boards.\
+				<img src="assets/example_3.png" alt="">\
+			</p>'),
+		Crafty.e("HTML")
+			.attr({ x:0, y:0, w:Crafty.viewport.width, h:Crafty.viewport.height })
+			.replace('<div class="instructions"><h3>Controls</h3>\
+			<p>\
+				<strong>Left mouse button</strong> - Toggle a grid cell<br>\
+				<strong>Right mouse button</strong> - Place a clue to flag cells as not-filled\
+			</p>')
+	];
+	function togglePageVisibility() {
+		for (var i = 0; i < pages.length; i++) {
+			pages[i].visible = i == current_page;
+		}
+	}
+	togglePageVisibility();
+
+	// Previous & Next
+	Crafty.e('SpriteButton')
+		.button('sprite_arrow_left', 'sprite_arrow_left_hover', 10, Crafty.viewport.height - 48)
+		.bind('ButtonClicked', function() {
+			if (current_page != 0) {
+				current_page--;
+				togglePageVisibility();
+			}
+		});
+	Crafty.e('SpriteButton')
+		.button('sprite_arrow_right', 'sprite_arrow_right_hover', Crafty.viewport.width - 48, Crafty.viewport.height - 48)
+		.bind('ButtonClicked', function() {
+			if (current_page != pages.length - 1) {
+				current_page++;
+				togglePageVisibility();
+			}
+		});
+
+	// Back
+	Crafty.e('TextButton')
+		.button('BACK', Crafty.viewport.width - 48, 24)
+		.textFont({
+			size: '24px'
+		})
+		.bind('ButtonClicked', function() {
+			Crafty.scene('Menu');
 		});
 });
 

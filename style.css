@@ -43,13 +43,14 @@ footer {
 .instructions {
 	margin: 1em auto;
 	text-align: left;
-	width: 800px;
+	padding: 2em;
 }
 
 	.instructions img {
 		display: block;
-		margin: 0.5em auto;
-		height: 300px;
+		margin: 2em auto;
+		max-height: 60%;
+		max-width: 80%;
 	}
 
 	.instructions p {
