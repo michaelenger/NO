@@ -33,10 +33,10 @@ Crafty.scene('Loading', function() {
  */
 Crafty.scene('Menu', function() {
 	var board_size = Game.config.board_size,
-		board_width = Math.ceil((Crafty.viewport.width < Crafty.viewport.height ? Crafty.viewport.width : Crafty.viewport.height) * 0.6),
+		board_width = Math.ceil((Crafty.viewport.width < Crafty.viewport.height ? Crafty.viewport.width : Crafty.viewport.height) * 0.35),
 		board_height = board_width,
 		board_x = Math.ceil((Crafty.viewport.width - board_width) / 2),
-		board_y = Math.ceil(Crafty.viewport.height * 0.4 - (board_height / 2));
+		board_y = Math.ceil(Crafty.viewport.height * 0.5 - (board_height / 2));
 
 	var board = Crafty.e('Board')
 		.attr({ x: board_x, y: board_y, w: board_width, h: board_height })
@@ -68,9 +68,34 @@ Crafty.scene('Menu', function() {
 			'text-transform': 'uppercase'
 		});
 
+	// Header
+	var h1 = Crafty.e('2D, DOM, Text')
+		.text('NO')
+		.attr({ x: 0, y: 10, w: Crafty.viewport.width })
+		.textFont({
+			family: 'Arial',
+			weight: 'bold',
+			size: (Crafty.viewport.width * 0.1) + 'px'
+		})
+		.css({
+			'text-align': 'center',
+		});
+	Crafty.e('2D, DOM, Text')
+		.text('A Game of Numbers')
+		.attr({ x: 0, y: (Crafty.viewport.width * 0.1) + 20, w: Crafty.viewport.width })
+		.textFont({
+			family: 'Arial',
+			weight: 'bold',
+			size: (Crafty.viewport.width * 0.025) + 'px'
+		})
+		.css({
+			'color': 'rgb(125,198,250)',
+			'text-align': 'center',
+		});
+
 	// Previous & Next
 	Crafty.e('SpriteButton')
-		.button('sprite_arrow_left', 'sprite_arrow_left_hover', Crafty.viewport.width * 0.15 - 16, Crafty.viewport.height * 0.4)
+		.button('sprite_arrow_left', 'sprite_arrow_left_hover', board_x - 48, board_y + (board_height / 2) - 12)
 		.bind('ButtonClicked', function() {
 			if (board_size > 3) {
 				board_size--;
@@ -79,7 +104,7 @@ Crafty.scene('Menu', function() {
 			}
 		});
 	Crafty.e('SpriteButton')
-		.button('sprite_arrow_right', 'sprite_arrow_right_hover', Crafty.viewport.width * 0.85 - 16, Crafty.viewport.height * 0.4)
+		.button('sprite_arrow_right', 'sprite_arrow_right_hover', board_x + board_width + 16, board_y + (board_height / 2) - 12)
 		.bind('ButtonClicked', function() {
 			if (board_size < 10) {
 				board_size++;
