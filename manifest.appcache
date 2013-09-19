@@ -1,0 +1,19 @@
+CACHE MANIFEST
+# v0.1 - 2013-09-19
+
+# Basic
+index.html
+style.css
+
+# Lib
+lib/crafty.js
+lib/Array.compare.js
+
+# Src
+src/game.js
+src/scenes.js
+src/components.js
+
+# Assets
+assets/arrows.png
+assets/clue.png
