@@ -81,13 +81,28 @@ Crafty.c('Board', {
 			//this._clues[i].destroy();
 		}
 		this._clues = [];
+
 		context.fillStyle = 'rgba(117, 119, 120, 1)';
+		context.strokeStyle = 'rgba(216, 219, 223, 1)';
+		context.lineWidth = cell_size * 0.13;
 		for (var x = 0; x < this._cells.length; x++) {
 			for (var y = 0; y < this._cells[x].length; y++) {
 				if (this._cells[x][y] === 1) {
 					context.fillRect(this._x + (cell_size * x) + 1, this._y + (cell_size * y) + 1, cell_size - 2, cell_size - 2);
 				} else if (this._cells[x][y] === -1) {
-					context.drawImage(clue_image, this._x + (cell_size * x), this._y + (cell_size * y), cell_size, cell_size)
+					context.beginPath();
+					context.arc(this._x + (cell_size * x) + (cell_size / 2), this._y + (cell_size * y) + (cell_size / 2), cell_size * 0.35, 0, Math.PI * 2, true);
+					context.closePath();
+					context.stroke();
+
+					context.beginPath();
+					context.moveTo(this._x + (cell_size * x) + (cell_size * 0.25), this._y + (cell_size * y) + (cell_size * 0.75));
+					context.lineTo(this._x + (cell_size * x) + (cell_size * 0.75), this._y + (cell_size * y) + (cell_size * 0.25));
+					context.closePath();
+					context.stroke();
+
+//					context.fillRect(this._x + (cell_size * x) + 1, this._y + (cell_size * y) + 1, cell_size - 2, cell_size - 2);
+//					context.drawImage(clue_image, this._x + (cell_size * x), this._y + (cell_size * y), cell_size, cell_size)
 				}
 			}
 		}
