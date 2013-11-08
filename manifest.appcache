@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v0.1 - 2013-09-19
+# v0.1.1 - 2013-11-08
 
 # Basic
 index.html
@@ -17,3 +17,6 @@ src/components.js
 # Assets
 assets/arrows.png
 assets/clue.png
+assets/example_1.png
+assets/example_2.png
+assets/example_3.png
