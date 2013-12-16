@@ -151,7 +151,9 @@ Crafty.c('Board', {
 		x = Math.floor(x / cell_size);
 		y = Math.floor(y / cell_size);
 
-		if (e.mouseButton == Crafty.mouseButtons.LEFT) {
+		if (Crafty.mobile) {
+			this._cells[x][y] = this._cells[x][y] === 1 ? -1 : this._cells[x][y] + 1;
+		} else if (e.mouseButton == Crafty.mouseButtons.LEFT) {
 			this._cells[x][y] = this._cells[x][y] === 1 ? 0 : 1;
 		} else if (e.mouseButton == Crafty.mouseButtons.RIGHT) {
 			this._cells[x][y] = this._cells[x][y] === -1 ? 0 : -1;
