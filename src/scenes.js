@@ -345,7 +345,7 @@ Crafty.scene('Game', function() {
 			var overlay = Crafty.e('2D, DOM, Color, Tween')
 				.attr({ x: 0, y: 0, w: Crafty.viewport.width, h: Crafty.viewport.height, alpha: 0 })
 				.color('#f0f3f7')
-				.tween({alpha: 0.95 }, 15)
+				.tween({alpha: 0.95 }, 200)
 				.bind('TweenEnd', function() {
 					Crafty.e('2D, DOM, Text')
 						.text('Congratulations!')
