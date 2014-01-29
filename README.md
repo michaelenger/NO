@@ -1,8 +1,8 @@
 # NO (HTML5)
 
-HTML5 puzzle game where you solve nonograms. A web variant of the [NO game for LÖVE](https://github.com/michaelenger/NO).
+HTML5 puzzle game where you solve nonograms. A web variant of the [NO game for LÖVE](https://github.com/michaelenger/NO-Classic).
 
-A demo is available on the GitHub page for this repository: [Demo](http://michaelenger.github.io/NO-HTML5/)
+A demo is available on the GitHub page for this repository: [Demo](http://michaelenger.github.io/NO/)
 
 ## License
 
