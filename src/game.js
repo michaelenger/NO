@@ -1,37 +1,28 @@
-(function() {
 "use strict";
-
-/**
- * Game - Main game object which handles starting the game as well as some config info.
- */
-var Game = {
+(function() {
 
 	/**
-	 * Game configuration.
-	 *
-	 * @var object
+	 * NO - A game of numbers.
 	 */
-	config: {
-		board_size: 6,
-		width: 800,
-		height: 600
-	},
+	var Game = function(element) {
+		this.stage = new PIXI.Stage(0xf0f3f7);
+		this.renderer = PIXI.autoDetectRenderer(element.clientWidth, element.clientHeight);
+		element.appendChild(this.renderer.view);
+		requestAnimFrame(this.draw.bind(this));
+	};
 
 	/**
-	 * Start the game.
+	 * Render the stage.
 	 */
-	start: function() {
-		Crafty.init(Game.config.width, Game.config.height);
-		Crafty.background('#f0f3f7');
-		Crafty.scene('Loading');
+	Game.prototype.draw = function() {
+		this.renderer.render(this.stage);
+		requestAnimFrame(this.draw.bind(this));
+	};
+
+	// Start the game
+	window.onload = function() {
+		var game = document.getElementById("game");
+		new Game(game); // let's go
 	}
-
-}
-
-// Start the game
-if (window) {
-	window.addEventListener('load', Game.start);
-	window.Game = Game; // expose the game to the other scripts
-}
 
 })();
