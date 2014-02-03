@@ -5,12 +5,16 @@ define(['lib/pixi'], function(PIXI) {
 	 * Board - A game board used in the game.
 	 */
 	var Board = function(x, y, size, cells) {
+		PIXI.Graphics.call(this);
+		PIXI.EventTarget.call(this);
+
 		this.x = x;
 		this.y = y;
 		this.size = size;
 		this.cells = cells;
+		this.interactive = true;
+		this.mousedown = this.touchstart = this.onClicked;
 
-		PIXI.Graphics.call(this);
 		this.redraw();
 	};
 
@@ -18,7 +22,15 @@ define(['lib/pixi'], function(PIXI) {
 	Board.prototype.constructor = Board;
 
 	/**
-	 * Redraw the board.
+	 * Board was clicked/touched.
+	 */
+	Board.prototype.onClicked = function(event) {
+		var clickEvent = new CustomEvent("clicked", { detail: this.reverseTranslatePosition(event.global) });
+		this.dispatchEvent(clickEvent);
+	};
+
+	/**
+	 * Draw the board - should be called if the position/size is changed.
 	 */
 	Board.prototype.redraw = function() {
 		var s2 = this.size / 2,
@@ -27,6 +39,9 @@ define(['lib/pixi'], function(PIXI) {
 			y1 = this.y - s2,
 			y2 = this.y + s2,
 			cell = this.size / this.cells;
+		this.width = this.size;
+		this.height = this.size;
+		this.hitArea = new PIXI.Rectangle(x1, y1, x2 - x1, y2 - y1);
 
 		this.clear();
 
@@ -47,6 +62,19 @@ define(['lib/pixi'], function(PIXI) {
 		this.lineTo(x1, y2);
 		this.lineTo(x1, y1);
 	};
+
+	/**
+	 * Translate global X/Y position to local coordinates.
+	 */
+	Board.prototype.reverseTranslatePosition = function(position) {
+		var x = this.x - (this.size / 2),
+			y = this.y - (this.size / 2),
+			cellSize = this.size / this.cells;
+		position.x = Math.ceil((position.x - x) / cellSize);
+		position.y = Math.ceil((position.y - y) / cellSize);
+		return position;
+	};
+
 
 	return Board;
 

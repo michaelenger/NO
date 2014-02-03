@@ -21,8 +21,11 @@ require(['lib/pixi', 'Board'], function(PIXI, Board) {
 		element.appendChild(this.renderer.view);
 
 		// Setup the board
-		this.board = new Board(width / 2, height * 0.6, height * 0.6, 6);
-		this.stage.addChild(this.board);
+		var board = new Board(width / 2, height * 0.6, height * 0.6, 6);
+		this.stage.addChild(board);
+		board.addEventListener("clicked", function(event) {
+			console.log(event.detail);
+		});
 
 		// Draw
 		this.draw();
