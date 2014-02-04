@@ -11,62 +11,18 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare']
 	/**
 	 * NO - A game of numbers.
 	 */
-	var Game = function(element) {
+	var Game = function(element, boardSize) {
 		var width = element.clientWidth,
-			height = element.clientHeight,
-			gridSize = 6;
+			height = element.clientHeight;
 
-		// Set the stage
-		this.stage = new PIXI.Stage(0xf0f3f7);
 		this.renderer = PIXI.autoDetectRenderer(width, height);
-		element.appendChild(this.renderer.view);
-
-		// Setup the board
-		this.board = new Board(width / 2, height * 0.6, height * 0.6, gridSize);
-		this.stage.addChild(this.board);
+		this.setup(boardSize);
 		this.board.addEventListener("clicked", this.boardClicked.bind(this));
 
-		// Setup the cells
-		this.cells = [];
-		for (var x = 0; x < gridSize; x++) {
-			this.cells[x] = [];
-			for (var y = 0; y < gridSize; y++) {
-				this.cells[x][y] = undefined;
-			}
-		}
-
-		// Generate the puzzle and show hints
-		this.puzzle = this.generatePuzzle(gridSize);
-		this.hints = this.buildHints(this.puzzle);
-		for (var x = 0; x < this.hints.vertical.length; x++) {
-			var content = this.hints.vertical[x].join("\n"),
-				text = new PIXI.Text(content, {
-				font: "bold " + (this.board.cellSize * 0.5) + "px Arial",
-				fill: "#444444",
-				align: "center"
-			});
-			text.anchor.x = 0.5;
-			text.anchor.y = 1;
-			text.position.x = this.board.x - (this.board.width / 2) + ((x + 0.5) * this.board.cellSize);
-			text.position.y = this.board.y - (this.board.height / 2) - (this.board.cellSize * 0.1);
-			this.stage.addChild(text);
-		}
-		for (var y = 0; y < this.hints.horizontal.length; y++) {
-			var content = this.hints.horizontal[y].join(" ") + " ",
-				text = new PIXI.Text(content, {
-				font: "bold " + (this.board.cellSize * 0.5) + "px Arial",
-				fill: "#444444",
-				align: "center"
-			});
-			text.anchor.x = 1;
-			text.anchor.y = 0.5;
-			text.position.x = this.board.x - (this.board.width / 2) - (this.board.cellSize * 0.1);
-			text.position.y = this.board.y - (this.board.height / 2) + ((y + 0.5) * this.board.cellSize);
-			this.stage.addChild(text);
-		}
+		element.appendChild(this.renderer.view);
 
 		// Begin the loop
-		this.draw();
+		this.loop();
 	};
 
 	/**
@@ -102,7 +58,7 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare']
 		}
 
 		if (this.checkSolution(cells, this.hints)) {
-			console.log("DONE");
+			this.reset();
 		}
 	};
 
@@ -196,15 +152,68 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare']
 	};
 
 	/**
-	 * Render the stage.
+	 * Main loop.
 	 */
-	Game.prototype.draw = function() {
+	Game.prototype.loop = function() {
 		this.renderer.render(this.stage);
-		requestAnimFrame(this.draw.bind(this));
+		requestAnimFrame(this.loop.bind(this));
 	};
+
+	/**
+	 * Setup the game.
+	 */
+	Game.prototype.setup = function(boardSize) {
+		// Set the stage
+		this.stage = new PIXI.Stage(0xf0f3f7);
+		this.board = new Board(this.renderer.width / 2, this.renderer.height * 0.6, this.renderer.height * 0.6, boardSize);
+		this.stage.addChild(this.board);
+
+		// Setup the cells
+		this.cells = [];
+		for (var x = 0; x < boardSize; x++) {
+			this.cells[x] = [];
+			for (var y = 0; y < boardSize; y++) {
+				this.cells[x][y] = undefined;
+			}
+		}
+
+		// Generate the puzzle and show hints
+		this.puzzle = this.generatePuzzle(boardSize);
+		this.hints = this.buildHints(this.puzzle);
+		for (var x = 0; x < this.hints.vertical.length; x++) {
+			var content = this.hints.vertical[x].join("\n"),
+				text = new PIXI.Text(content, {
+				font: "bold " + (this.board.cellSize * 0.5) + "px Arial",
+				fill: "#444444",
+				align: "center"
+			});
+			text.anchor.x = 0.5;
+			text.anchor.y = 1;
+			text.position.x = this.board.x - (this.board.width / 2) + ((x + 0.5) * this.board.cellSize);
+			text.position.y = this.board.y - (this.board.height / 2) - (this.board.cellSize * 0.1);
+			this.stage.addChild(text);
+		}
+		for (var y = 0; y < this.hints.horizontal.length; y++) {
+			var content = this.hints.horizontal[y].join(" ") + " ",
+				text = new PIXI.Text(content, {
+				font: "bold " + (this.board.cellSize * 0.5) + "px Arial",
+				fill: "#444444",
+				align: "center"
+			});
+			text.anchor.x = 1;
+			text.anchor.y = 0.5;
+			text.position.x = this.board.x - (this.board.width / 2) - (this.board.cellSize * 0.1);
+			text.position.y = this.board.y - (this.board.height / 2) + ((y + 0.5) * this.board.cellSize);
+			this.stage.addChild(text);
+		}
+	};
+
+	Game.prototype.reset = function() {
+		this.setup(6);
+	}
 
 	// Let's go!
 	var game = document.getElementById("game");
-	new Game(game); // let's go
+	new Game(game, 6); // let's go
 
 });
