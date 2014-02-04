@@ -6,7 +6,7 @@ requirejs.config({
 	}
 });
 
-require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
+require(['lib/pixi', 'board', 'cell', 'lib/Array.compare'], function(PIXI, Board, Cell) {
 
 	/**
 	 * NO - A game of numbers.
@@ -37,9 +37,9 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 
 		// Generate the puzzle and show hints
 		this.puzzle = this.generatePuzzle(gridSize);
-		var hints = this.buildHints(this.puzzle);
-		for (var x = 0; x < hints.vertical.length; x++) {
-			var content = hints.vertical[x].join("\n"),
+		this.hints = this.buildHints(this.puzzle);
+		for (var x = 0; x < this.hints.vertical.length; x++) {
+			var content = this.hints.vertical[x].join("\n"),
 				text = new PIXI.Text(content, {
 				font: "bold " + (this.board.cellSize * 0.5) + "px Arial",
 				fill: "#444444",
@@ -51,8 +51,8 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 			text.position.y = this.board.y - (this.board.height / 2) - (this.board.cellSize * 0.1);
 			this.stage.addChild(text);
 		}
-		for (var y = 0; y < hints.horizontal.length; y++) {
-			var content = hints.horizontal[y].join(" ") + " ",
+		for (var y = 0; y < this.hints.horizontal.length; y++) {
+			var content = this.hints.horizontal[y].join(" ") + " ",
 				text = new PIXI.Text(content, {
 				font: "bold " + (this.board.cellSize * 0.5) + "px Arial",
 				fill: "#444444",
@@ -75,6 +75,7 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 	Game.prototype.boardClicked = function(event) {
 		var position, cell;
 
+		// Toggle cell
 		if (this.cells[event.detail.x-1][event.detail.y-1]) {
 			cell = this.cells[event.detail.x-1][event.detail.y-1];
 			if (cell.type == Cell.FILLED) {
@@ -89,6 +90,19 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 			cell = new Cell(position.x, position.y, this.board.cellSize - 2, Cell.FILLED);
 			this.stage.addChild(cell);
 			this.cells[event.detail.x-1][event.detail.y-1] = cell;
+		}
+
+		// Check solution
+		var cells = [];
+		for (var x = 0; x < this.cells.length; x++) {
+			cells[x] = [];
+			for (var y = 0; y < this.cells[x].length; y++) {
+				cells[x][y] = this.cells[x][y] && this.cells[x][y].type == Cell.FILLED ? true : false;
+			}
+		}
+
+		if (this.checkSolution(cells, this.hints)) {
+			console.log("DONE");
 		}
 	};
 
@@ -141,6 +155,18 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 		}
 
 		return hints;
+	};
+
+	/**
+	 * Check the solution against the hints.
+	 */
+	Game.prototype.checkSolution = function(solution, hints) {
+		var solutionsHints = this.buildHints(solution);
+		if (solutionsHints.horizontal.compare(hints.horizontal) &&
+			solutionsHints.vertical.compare(hints.vertical)) {
+			return true;
+		}
+		return false;
 	};
 
 	/**
