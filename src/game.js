@@ -35,7 +35,37 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 			}
 		}
 
-		// Draw
+		// Generate the puzzle and show hints
+		this.puzzle = this.generatePuzzle(gridSize);
+		var hints = this.buildHints(this.puzzle);
+		for (var x = 0; x < hints.vertical.length; x++) {
+			var content = hints.vertical[x].join("\n"),
+				text = new PIXI.Text(content, {
+				font: "bold " + (this.board.cellSize * 0.5) + "px Arial",
+				fill: "#444444",
+				align: "center"
+			});
+			text.anchor.x = 0.5;
+			text.anchor.y = 1;
+			text.position.x = this.board.x - (this.board.width / 2) + ((x + 0.5) * this.board.cellSize);
+			text.position.y = this.board.y - (this.board.height / 2) - (this.board.cellSize * 0.1);
+			this.stage.addChild(text);
+		}
+		for (var y = 0; y < hints.horizontal.length; y++) {
+			var content = hints.horizontal[y].join(" ") + " ",
+				text = new PIXI.Text(content, {
+				font: "bold " + (this.board.cellSize * 0.5) + "px Arial",
+				fill: "#444444",
+				align: "center"
+			});
+			text.anchor.x = 1;
+			text.anchor.y = 0.5;
+			text.position.x = this.board.x - (this.board.width / 2) - (this.board.cellSize * 0.1);
+			text.position.y = this.board.y - (this.board.height / 2) + ((y + 0.5) * this.board.cellSize);
+			this.stage.addChild(text);
+		}
+
+		// Begin the loop
 		this.draw();
 	};
 
@@ -60,6 +90,83 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 			this.stage.addChild(cell);
 			this.cells[event.detail.x-1][event.detail.y-1] = cell;
 		}
+	};
+
+	/**
+	 * Build hints from a puzzle.
+	 */
+	Game.prototype.buildHints = function(puzzle) {
+		var hints = {
+			horizontal: [],
+			vertical: []
+		};
+		var tempHorizontal = [];
+
+		for (var x = 0; x < puzzle.length; x++) {
+			var current = 0;
+			hints.vertical[x] = [];
+			for (var y = 0; y < puzzle[x].length; y++) {
+				if (!tempHorizontal[y]) {
+					tempHorizontal[y] = [];
+				}
+
+				tempHorizontal[y].push(puzzle[x][y]);
+
+				if (puzzle[x][y]) {
+					current++;
+				} else if (current != 0) {
+					hints.vertical[x].push(current);
+					current = 0;
+				}
+			}
+			if (current != 0) {
+				hints.vertical[x].push(current);
+			}
+		}
+
+		for (var y = 0; y < tempHorizontal.length; y++) {
+			var current = 0;
+			hints.horizontal[y] = [];
+			for (var i = 0; i < tempHorizontal[y].length; i++) {
+				if (tempHorizontal[y][i]) {
+					current++;
+				} else if (current != 0) {
+					hints.horizontal[y].push(current);
+					current = 0;
+				}
+			}
+			if (current != 0) {
+				hints.horizontal[y].push(current);
+			}
+		}
+
+		return hints;
+	};
+
+	/**
+	 * Generate a new puzzle.
+	 */
+	Game.prototype.generatePuzzle = function(size) {
+		var cells = [];
+		for (var x = 0; x < size; x++) {
+			cells[x] = [];
+			for (var y = 0; y < size; y++) {
+				cells[x][y] = Math.floor(Math.random() * (10 - 2) + 1) < 7 ? true : false;
+			}
+		}
+
+		// Debug display of the puzzle
+		var lines = [];
+		for (var x = 0; x < cells.length; x++) {
+			for (var y = 0; y < cells[x].length; y++) {
+				if (!lines[y]) {
+					lines[y] = "";
+				}
+				lines[y] += cells[x][y] ? "X" : "O";
+			}
+		}
+		console.log(lines.join("\n"));
+		return cells;
 	};
 
 	/**
