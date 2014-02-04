@@ -6,7 +6,7 @@ requirejs.config({
 	}
 });
 
-require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare'], function(PIXI, Board, Cell) {
+require(['lib/pixi', 'components/Board', 'components/Cell', 'components/Button', 'lib/Array.compare'], function(PIXI, Board, Cell, Button) {
 
 	/**
 	 * NO - A game of numbers.
@@ -16,8 +16,21 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare']
 			height = element.clientHeight;
 
 		this.renderer = PIXI.autoDetectRenderer(width, height);
+
+		// Setup board
+		this.stage = new PIXI.Stage(0xf0f3f7);
 		this.setup(boardSize);
-		this.board.addEventListener("clicked", this.boardClicked.bind(this));
+
+		// Setup UI
+		var button = new Button("refresh.png");
+		button.anchor.x = 1.2;
+		button.anchor.y = -0.2;
+		button.position.x = width;
+		button.position.y = 0;
+
+		button.addEventListener("clicked", this.reset.bind(this));
+
+		this.stage.addChild(button);
 
 		element.appendChild(this.renderer.view);
 
@@ -38,13 +51,13 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare']
 				cell.type = Cell.HINT;
 				cell.redraw();
 			} else {
-				this.stage.removeChild(cell);
+				this.board.removeChild(cell);
 				this.cells[event.detail.x-1][event.detail.y-1] = undefined;
 			}
 		} else {
 			position = this.board.translatePosition(event.detail);
 			cell = new Cell(position.x, position.y, this.board.cellSize - 2, Cell.FILLED);
-			this.stage.addChild(cell);
+			this.board.addChild(cell);
 			this.cells[event.detail.x-1][event.detail.y-1] = cell;
 		}
 
@@ -164,8 +177,8 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare']
 	 */
 	Game.prototype.setup = function(boardSize) {
 		// Set the stage
-		this.stage = new PIXI.Stage(0xf0f3f7);
 		this.board = new Board(this.renderer.width / 2, this.renderer.height * 0.6, this.renderer.height * 0.6, boardSize);
+		this.board.addEventListener("clicked", this.boardClicked.bind(this));
 		this.stage.addChild(this.board);
 
 		// Setup the cells
@@ -191,7 +204,7 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare']
 			text.anchor.y = 1;
 			text.position.x = this.board.x - (this.board.width / 2) + ((x + 0.5) * this.board.cellSize);
 			text.position.y = this.board.y - (this.board.height / 2) - (this.board.cellSize * 0.1);
-			this.stage.addChild(text);
+			this.board.addChild(text);
 		}
 		for (var y = 0; y < this.hints.horizontal.length; y++) {
 			var content = this.hints.horizontal[y].join(" ") + " ",
@@ -204,11 +217,13 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare']
 			text.anchor.y = 0.5;
 			text.position.x = this.board.x - (this.board.width / 2) - (this.board.cellSize * 0.1);
 			text.position.y = this.board.y - (this.board.height / 2) + ((y + 0.5) * this.board.cellSize);
-			this.stage.addChild(text);
+			this.board.addChild(text);
 		}
 	};
 
 	Game.prototype.reset = function() {
+		this.stage.removeChild(this.board);
+		delete this.board;
 		this.setup(6);
 	}
 
