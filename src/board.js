@@ -16,6 +16,12 @@ define(['lib/pixi'], function(PIXI) {
 		this.mousedown = this.touchstart = this.onClicked;
 
 		this.redraw();
+
+		Object.defineProperty(this, "cellSize", {
+			get: function() {
+				return this.size / this.cells;
+			}
+		});
 	};
 
 	Board.prototype = Object.create(PIXI.Graphics.prototype);
@@ -67,14 +73,27 @@ define(['lib/pixi'], function(PIXI) {
 	 * Translate global X/Y position to local coordinates.
 	 */
 	Board.prototype.reverseTranslatePosition = function(position) {
-		var x = this.x - (this.size / 2),
+		var position = position.clone(),
+			x = this.x - (this.size / 2),
 			y = this.y - (this.size / 2),
-			cellSize = this.size / this.cells;
+			cellSize = this.cellSize;
 		position.x = Math.ceil((position.x - x) / cellSize);
 		position.y = Math.ceil((position.y - y) / cellSize);
 		return position;
 	};
 
+	/**
+	 * Translate local X/Y position to global coordinates.
+	 */
+	Board.prototype.translatePosition = function(position) {
+		var position = position.clone(),
+			x = this.x - (this.size / 2),
+			y = this.y - (this.size / 2),
+			cellSize = this.cellSize;
+		position.x = x + ((position.x - 0.5) * this.cellSize);
+		position.y = y + ((position.y - 0.5) * this.cellSize);
+		return position;
+	};
 
 	return Board;
 
