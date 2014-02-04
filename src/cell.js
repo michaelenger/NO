@@ -43,10 +43,10 @@ define(['lib/pixi'], function(PIXI) {
 				this.endFill();
 				break;
 			case Cell.HINT:
-				s = this.size * 0.4;
+				s = this.size * 0.35;
 				x = this.x - (this.size * 0.3);
 				y = this.y - (this.size * 0.3);
-				this.lineStyle(10, 0xd8dbdf, 1);
+				this.lineStyle(8, 0xd8dbdf, 1);
 				this.drawCircle(this.x, this.y, s);
 				this.moveTo(x, y + (this.size * 0.6));
 				this.lineTo(x + (this.size * 0.6), y);
