@@ -46,8 +46,14 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 		var position, cell;
 
 		if (this.cells[event.detail.x-1][event.detail.y-1]) {
-			this.stage.removeChild(this.cells[event.detail.x-1][event.detail.y-1]);
-			this.cells[event.detail.x-1][event.detail.y-1] = undefined;
+			cell = this.cells[event.detail.x-1][event.detail.y-1];
+			if (cell.type == Cell.FILLED) {
+				cell.type = Cell.HINT;
+				cell.redraw();
+			} else {
+				this.stage.removeChild(cell);
+				this.cells[event.detail.x-1][event.detail.y-1] = undefined;
+			}
 		} else {
 			position = this.board.translatePosition(event.detail);
 			cell = new Cell(position.x, position.y, this.board.cellSize - 2, Cell.FILLED);

@@ -31,7 +31,9 @@ define(['lib/pixi'], function(PIXI) {
 	 * Board was clicked/touched.
 	 */
 	Board.prototype.onClicked = function(event) {
-		var clickEvent = new CustomEvent("clicked", { detail: this.reverseTranslatePosition(event.global) });
+		var clickEvent = new CustomEvent("clicked", {
+			detail: this.reverseTranslatePosition(event.global)
+		});
 		this.dispatchEvent(clickEvent);
 	};
 
