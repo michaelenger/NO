@@ -151,7 +151,7 @@ require(['lib/pixi', 'board', 'cell'], function(PIXI, Board, Cell) {
 		for (var x = 0; x < size; x++) {
 			cells[x] = [];
 			for (var y = 0; y < size; y++) {
-				cells[x][y] = Math.floor(Math.random() * (10 - 2) + 1) < 7 ? true : false;
+				cells[x][y] = Math.floor(Math.random() * (10 - 2) + 1) < 5 ? true : false;
 			}
 		}
 
