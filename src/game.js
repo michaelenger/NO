@@ -6,7 +6,7 @@ requirejs.config({
 	}
 });
 
-require(['lib/pixi', 'board', 'cell', 'lib/Array.compare'], function(PIXI, Board, Cell) {
+require(['lib/pixi', 'components/Board', 'components/Cell', 'lib/Array.compare'], function(PIXI, Board, Cell) {
 
 	/**
 	 * NO - A game of numbers.
