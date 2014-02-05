@@ -4,9 +4,12 @@ define(['lib/pixi'], function(PIXI) {
 	/**
 	 * Button - Pressable sprite.
 	 */
-	var Button = function(image) {
-		var texture = PIXI.Texture.fromImage("assets/" + image);
-		PIXI.Sprite.call(this, texture);
+	var Button = function(text, size) {
+		PIXI.Text.call(this, text, {
+			font: "bold " + size + "px Arial",
+			fill: "#fff",
+			align: "center"
+		});
 		PIXI.EventTarget.call(this);
 
 		this.anchor.x = 0.5;
@@ -19,7 +22,7 @@ define(['lib/pixi'], function(PIXI) {
 		this.mousedown = this.touchstart = this.onClicked;
 	};
 
-	Button.prototype = Object.create(PIXI.Sprite.prototype);
+	Button.prototype = Object.create(PIXI.Text.prototype);
 	Button.prototype.constructor = Button;
 
 	/**

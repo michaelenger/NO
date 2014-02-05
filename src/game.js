@@ -1,12 +1,13 @@
 "use strict";
 requirejs.config({
-	baseUrl: 'src',
+	baseUrl: "src",
 	paths: {
-		lib: '../lib/'
+		lib: "../lib/"
 	}
 });
 
-require(['lib/pixi', 'components/Board', 'components/Cell', 'components/Button', 'lib/Array.compare'], function(PIXI, Board, Cell, Button) {
+require(["lib/pixi", "components/Board", "components/Cell", "components/Button", "lib/Array.compare"],
+	function(PIXI, Board, Cell, Button) {
 
 	/**
 	 * NO - A game of numbers.
@@ -22,11 +23,12 @@ require(['lib/pixi', 'components/Board', 'components/Cell', 'components/Button',
 		this.setup(boardSize);
 
 		// Setup UI
-		var button = new Button("refresh.png");
-		button.anchor.x = 1.2;
-		button.anchor.y = -0.2;
-		button.position.x = width;
-		button.position.y = 0;
+		var size = height * 0.03;
+		var button = new Button("RELOAD", size);
+		button.anchor.x = 1;
+		button.anchor.y = -0;
+		button.position.x = width - (size / 2);
+		button.position.y = size / 2;
 
 		button.addEventListener("clicked", this.reset.bind(this));
 
