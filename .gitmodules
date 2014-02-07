@@ -1,0 +1,3 @@
+[submodule "Assets/Plugins/SpriteGrid"]
+	path = Assets/Plugins/SpriteGrid
+	url = git@github.com:michaelenger/SpriteGrid.git
