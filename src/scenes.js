@@ -38,7 +38,7 @@ Crafty.scene('Menu', function() {
 		board_x = Math.ceil((Crafty.viewport.width - board_width) / 2),
 		board_y = Math.ceil(Crafty.viewport.height * 0.5 - (board_height / 2));
 
-	var board = Crafty.e('Board')
+	var board = Crafty.e('Board, Tween')
 		.attr({ x: board_x, y: board_y, w: board_width, h: board_height })
 		.board(board_size);
 	board._active = false;
@@ -96,22 +96,29 @@ Crafty.scene('Menu', function() {
 	// Previous & Next
 	Crafty.e('SpriteButton')
 		.button('sprite_arrow_left', 'sprite_arrow_left_hover', board_x - 48, board_y + (board_height / 2) - 12)
-		.bind('ButtonClicked', function() {
-			if (board_size > 3) {
-				board_size--;
-				puzzle_size.text(sizes[board_size]);
-				board.board(board_size);
-			}
-		});
+		.bind('ButtonClicked', changeBoardSize);
 	Crafty.e('SpriteButton')
 		.button('sprite_arrow_right', 'sprite_arrow_right_hover', board_x + board_width + 16, board_y + (board_height / 2) - 12)
-		.bind('ButtonClicked', function() {
-			if (board_size < 10) {
-				board_size++;
-				puzzle_size.text(sizes[board_size]);
-				board.board(board_size);
-			}
-		});
+		.bind('ButtonClicked', changeBoardSize);
+
+	function changeBoardSize(button) {
+		var direction = button._sprite_normal == "sprite_arrow_right" ? 1 : -1,
+			new_board_size = board_size + direction;
+		if (new_board_size >= 3 && new_board_size <= 10) {
+			board_size = new_board_size;
+			puzzle_size.text(sizes[board_size]);
+			var next_board = Crafty.e('Board, Tween')
+					.attr({ x: board.x + (100 * direction), y: board.y, w: board_width, h: board_height, aplha: 0 })
+					.board(board_size);
+				next_board._active = false;
+				board.tween({ x: board.x - (100 * direction), alpha: 0 }, 100)
+					.bind("TweenEnd", function(){
+						board.destroy();
+						board = next_board
+					});
+				next_board.tween({ x: board.x, alpha: 1 }, 100);
+		}
+	}
 
 	// Start
 	Crafty.e('TextButton')
