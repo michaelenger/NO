@@ -3,11 +3,14 @@ requirejs.config({
 	baseUrl: "src",
 	paths: {
 		lib: "../lib/"
+	},
+	shim: {
+		"lib/tween": { exports: "TWEEN" }
 	}
 });
 
-require(["lib/pixi", "components/Board", "components/Cell", "components/Button", "lib/Array.compare"],
-	function(PIXI, Board, Cell, Button) {
+require(["lib/pixi", "lib/tween", "components/Board", "components/Cell", "components/Button", "lib/Array.compare"],
+	function(PIXI, TWEEN, Board, Cell, Button) {
 
 	/**
 	 * NO - A game of numbers.
@@ -73,7 +76,7 @@ require(["lib/pixi", "components/Board", "components/Cell", "components/Button",
 		}
 
 		if (this.checkSolution(cells, this.hints)) {
-			this.reset();
+			this.complete();
 		}
 	};
 
@@ -141,6 +144,19 @@ require(["lib/pixi", "components/Board", "components/Cell", "components/Button",
 	};
 
 	/**
+	 * Game finished, show "you are done" screen.
+	 */
+	Game.prototype.complete = function() {
+		var board = this.board,
+			tween = new TWEEN.Tween( { alpha: 1 } )
+			.to( { alpha: 0 }, 250 )
+			.onUpdate( function () {
+				board.alpha = this.alpha;
+			} );
+		tween.start();
+	};
+
+	/**
 	 * Generate a new puzzle.
 	 */
 	Game.prototype.generatePuzzle = function(size) {
@@ -171,6 +187,7 @@ require(["lib/pixi", "components/Board", "components/Cell", "components/Button",
 	 */
 	Game.prototype.loop = function() {
 		this.renderer.render(this.stage);
+		TWEEN.update();
 		requestAnimFrame(this.loop.bind(this));
 	};
 
