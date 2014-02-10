@@ -40,6 +40,44 @@ Crafty.c('Board', {
 		this.requires('Canvas, 2D, Mouse')
 			.bind('Draw', this.drawBoard)
 			.bind('MouseDown', this.mouseDownEvent);
+
+		Object.defineProperty(this, "cells", {
+			get: function() {
+				var cells = [];
+				for (var x = 0; x < this._cells.length; x++) {
+					cells[x] = [];
+					for (var y = 0; y < this._cells[x].length; y++) {
+						cells[x][y] = this._cells[x][y] && this._cells[x][y].type == "cell" ? 1 : 0;
+					}
+				}
+				return cells;
+			}
+		});
+	},
+
+	/**
+	 * Setup the board with a specific size.
+	 *
+	 * @param int size Size of the grid
+	 * @return this
+	 */
+	board: function(size) {
+		this._grid_size = size || this._grid_size;
+
+		this._cells = new Array(this._grid_size);
+		for (var x = 0; x < this._cells.length; x++) {
+			this._cells[x] = new Array(this._grid_size);
+			for (var y = 0; y < this._cells[x].length; y++) {
+				this._cells[x][y] = undefined;
+			}
+		}
+
+		if (this.ready) {
+			this.trigger('Change');
+		} else {
+			this.ready = true;
+		}
+		return this;
 	},
 
 	/**
@@ -49,9 +87,7 @@ Crafty.c('Board', {
 	 */
 	drawBoard: function(vars) {
 		var context = vars.ctx,
-			cell_size = this._w / this._grid_size,
-			clue_image = new Image();
-		clue_image.src = 'assets/clue.png';
+			cell_size = this._w / this._grid_size;
 
 		context.save();
 
@@ -76,63 +112,17 @@ Crafty.c('Board', {
 		context.lineWidth = 2;
 		context.strokeRect(this._x, this._y, this._w, this._h);
 
-		// Cells
-		for (var i = 0; i < this._clues.length; i++) {
-			//this._clues[i].destroy();
-		}
-		this._clues = [];
-
-		context.fillStyle = 'rgba(117, 119, 120, 1)';
-		context.strokeStyle = 'rgba(216, 219, 223, 1)';
-		context.lineWidth = cell_size * 0.13;
-		for (var x = 0; x < this._cells.length; x++) {
-			for (var y = 0; y < this._cells[x].length; y++) {
-				if (this._cells[x][y] === 1) {
-					context.fillRect(this._x + (cell_size * x) + 1, this._y + (cell_size * y) + 1, cell_size - 2, cell_size - 2);
-				} else if (this._cells[x][y] === -1) {
-					context.beginPath();
-					context.arc(this._x + (cell_size * x) + (cell_size / 2), this._y + (cell_size * y) + (cell_size / 2), cell_size * 0.35, 0, Math.PI * 2, true);
-					context.closePath();
-					context.stroke();
-
-					context.beginPath();
-					context.moveTo(this._x + (cell_size * x) + (cell_size * 0.25), this._y + (cell_size * y) + (cell_size * 0.75));
-					context.lineTo(this._x + (cell_size * x) + (cell_size * 0.75), this._y + (cell_size * y) + (cell_size * 0.25));
-					context.closePath();
-					context.stroke();
-
-//					context.fillRect(this._x + (cell_size * x) + 1, this._y + (cell_size * y) + 1, cell_size - 2, cell_size - 2);
-//					context.drawImage(clue_image, this._x + (cell_size * x), this._y + (cell_size * y), cell_size, cell_size)
-				}
-			}
-		}
-
 		context.restore();
 	},
 
 	/**
-	 * Setup the board with a specific size.
-	 *
-	 * @param int size Size of the grid
-	 * @return this
+	 * Get the size of the cells.
 	 */
-	board: function(size) {
-		this._grid_size = size || this._grid_size;
-
-		this._cells = new Array(this._grid_size);
-		for (var x = 0; x < this._cells.length; x++) {
-			this._cells[x] = new Array(this._grid_size);
-			for (var y = 0; y < this._cells[x].length; y++) {
-				this._cells[x][y] = 0;
-			}
-		}
-
-		if (this.ready) {
-			this.trigger('Change');
-		} else {
-			this.ready = true;
-		}
-		return this;
+	cellSize: function() {
+		return {
+			w: this._w / this._grid_size,
+			h: this._h / this._grid_size
+		};
 	},
 
 	/**
@@ -147,20 +137,136 @@ Crafty.c('Board', {
 
 		var x = e.layerX - this._x,
 			y = e.layerY - this._y,
-			cell_size = Math.ceil(this._w / this._grid_size);
+			cell_size = Math.ceil(this._w / this._grid_size),
+			cell;
 		x = Math.floor(x / cell_size);
 		y = Math.floor(y / cell_size);
 
 		if (Crafty.mobile) {
-			this._cells[x][y] = this._cells[x][y] === 1 ? -1 : this._cells[x][y] + 1;
+			if (this._cells[x][y]) {
+				cell = this._cells[x][y].type == "cell" ? "hint" : false;
+			} else {
+				cell = "cell";
+			}
 		} else if (e.mouseButton == Crafty.mouseButtons.LEFT) {
-			this._cells[x][y] = this._cells[x][y] === 1 ? 0 : 1;
+			cell = this._cells[x][y] && this._cells[x][y].type == "cell"
+				? false
+				: "cell";
 		} else if (e.mouseButton == Crafty.mouseButtons.RIGHT) {
-			this._cells[x][y] = this._cells[x][y] === -1 ? 0 : -1;
+			cell = this._cells[x][y] && this._cells[x][y].type == "hint"
+				? false
+				: "hint";
 		}
-		this.trigger('Change');
 
+		if (this._cells[x][y] && cell == this._cells[x][y].type) {
+			return;
+		}
+
+		switch (cell) {
+			case "cell":
+				if (this._cells[x][y]) {
+					this._cells[x][y].destroy();
+				}
+				this._cells[x][y] = Crafty.e('Cell')
+					.cell(this, x, y);
+				break;
+			case "hint":
+				if (this._cells[x][y]) {
+					this._cells[x][y].destroy();
+				}
+				this._cells[x][y] = Crafty.e('Cell')
+					.hint(this, x, y);
+				break;
+			default:
+				if (this._cells[x][y]) {
+					this._cells[x][y].destroy();
+					delete this._cells[x][y];
+				}
+		}
+
+		this.trigger('Change');
 		Crafty.trigger('BoardChanged', this);
+	},
+
+	/**
+	 * Translate a grid position to a world position.
+	 */
+	translatePosition: function(x, y) {
+		var size = this.cellSize();
+		return {
+			x: x * size.w + this._x,
+			y: y * size.h + this._y
+		};
+	}
+});
+
+/**
+ * Cell - A filled cell in the board.
+ */
+Crafty.c('Cell', {
+
+	// Type of cell
+	type: "cell",
+
+	/**
+	 * Initialize the component.
+	 */
+	init: function() {
+		this.requires('Canvas, 2D, Color');
+	},
+
+	/**
+	 * Create the cell.
+	 *
+	 * @param board The board which holds the cell
+	 * @param x     X-position of the cell (in the board)
+	 * @param y     Y-position of the cell (in the board)
+	 */
+	cell: function(board, x, y) {
+		var size = board.cellSize(),
+			position = board.translatePosition(x, y);
+		this.color("rgba(117, 119, 120, 1)")
+			.attr({ x: position.x + 1, y: position.y + 1, w: size.w - 2, h: size.h - 2 });
+
+		return this;
+	},
+
+	/**
+	 * Create the hint.
+	 *
+	 * @param board The board which holds the cell
+	 * @param x     X-position of the cell (in the board)
+	 * @param y     Y-position of the cell (in the board)
+	 */
+	hint: function(board, x, y) {
+		this.type = "hint";
+		var size = board.cellSize(),
+			position = board.translatePosition(x, y);
+		this.color("rgba(216, 219, 223, 0)")
+			.attr({ x: position.x + 1, y: position.y + 1, w: size.w - 2, h: size.h - 2 })
+			.bind("Draw", this.drawHint);
+
+		return this;
+	},
+
+	drawHint: function(vars) {
+		var context = vars.ctx,
+			cell_size = this._w;
+
+		context.save();
+
+		context.strokeStyle = 'rgba(216, 219, 223, 1)';
+		context.lineWidth = cell_size * 0.13;
+		context.beginPath();
+		context.arc(this._x + (cell_size / 2), this._y + (cell_size / 2), cell_size * 0.35, 0, Math.PI * 2, true);
+		context.closePath();
+		context.stroke();
+
+		context.beginPath();
+		context.moveTo(this._x + (cell_size * 0.25), this._y + (cell_size * 0.75));
+		context.lineTo(this._x + (cell_size * 0.75), this._y + (cell_size * 0.25));
+		context.closePath();
+		context.stroke();
 	}
 });
 

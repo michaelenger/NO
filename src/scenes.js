@@ -333,7 +333,7 @@ Crafty.scene('Game', function() {
 
 	// Events
 	this.bind('BoardChanged', function(board) {
-		var boardClues = translateCellsToClues(board._cells),
+		var boardClues = translateCellsToClues(board.cells),
 			success = clues.vertical.compare(boardClues.vertical) && clues.horizontal.compare(boardClues.horizontal);
 		if (success) {
 			var end_time = new Date(),
